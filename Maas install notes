@@ -1,0 +1,66 @@
+Install Ubuntu
+sudo apt install -y openssh-server jq vim net-tools
+
+
+
+From your desktop/laptop run following commands to generate ssh keys
+ssh-keygen -t rsa
+ssh-copy-id -i ~/.ssh/id_rsa.pub rahi@10.32.130.100
+sudo snap install --channel=2.9/beta maas 
+sudo apt update -y
+sudo apt install -y postgresql
+sudo -u postgres psql -c "CREATE USER \"maasdb\" WITH ENCRYPTED PASSWORD 'rahi1234'"
+sudo -u postgres createdb -O "maasdb" "maas_database"
+Edit /etc/postgresql/12/main/pg_hba.conf and add a line for the newly created database, replacing the variables with actual names. You can limit access to a specific network by using a different CIDR than 0/0.
+host    maas_database    maasdb    0/0     md5
+sudo maas init region+rack --database-uri "postgres://maasdb:rahi1234@localhost/maas_database"
+sudo maas createadmin
+Skip ssh keys
+Create http://launchpad.net account
+Login to account and add ssh keys to profile
+Login to browser page:  http://10.32.130.100:5240/MAAS
+Login using admin account created during step 12
+Login to launchpad account to add ssh keys
+Add latest Ubuntu LTS image
+Enable dhcp by from dashboard>Subnets>Untagged>Enable dhcp
+
+Maas CLI setup:
+ssh rahi@10.32.130.100
+Log in (required)
+To use the CLI you must first log in to the API server (region controller).
+You will need the API key that MAAS generated when creating your MAAS account. To obtain it, run this command on the region controller (i.e. wherever you installed the ‘maas-region-controller’ package):
+sudo maas apikey --username=$PROFILE > $API_KEY_FILE
+
+
+You can obtain a user’s API key from the web interface. Click on ‘username’ in the top right corner, and select ‘Account’.
+Log in. MAAS will prompt you for the API key:
+maas login $PROFILE $MAAS_URL
+
+
+For example, to log in with the account whose username is ‘admin’ and where the region controller is on the localhost:
+maas login admin http://localhost:5240/MAAS/api/2.0
+
+
+To log in by referring to the API key file created earlier:
+maas login $PROFILE $MAAS_URL - < $API_KEY_FILE
+
+
+A handy shell script, say maas-login.sh, is provided:
+#!/bin/sh
+
+
+# Change these 3 values as required 
+PROFILE=admin
+API_KEY_FILE=~/api_key
+API_SERVER=localhost
+
+
+MAAS_URL=http://$API_SERVER/MAAS/api/2.0
+
+
+maas login $PROFILE $MAAS_URL - < $API_KEY_FILE
+
+
+
+Adding ssh pub keys to existing hosts
+https://unix.stackexchange.com/questions/204985/how-can-i-propagate-my-ssh-pub-key-to-a-list-of-servers-without-having-to-type-m
