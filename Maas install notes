@@ -9,11 +9,11 @@ ssh-copy-id -i ~/.ssh/id_rsa.pub rahi@10.32.130.100
 sudo snap install --channel=2.9/beta maas 
 sudo apt update -y
 sudo apt install -y postgresql
-sudo -u postgres psql -c "CREATE USER \"maasdb\" WITH ENCRYPTED PASSWORD 'rahi1234'"
+sudo -u postgres psql -c "CREATE USER \"maasdb\" WITH ENCRYPTED PASSWORD 'password123'"
 sudo -u postgres createdb -O "maasdb" "maas_database"
 Edit /etc/postgresql/12/main/pg_hba.conf and add a line for the newly created database, replacing the variables with actual names. You can limit access to a specific network by using a different CIDR than 0/0.
 host    maas_database    maasdb    0/0     md5
-sudo maas init region+rack --database-uri "postgres://maasdb:rahi1234@localhost/maas_database"
+sudo maas init region+rack --database-uri "postgres://maasdb:password123@localhost/maas_database"
 sudo maas createadmin
 Skip ssh keys
 Create http://launchpad.net account
